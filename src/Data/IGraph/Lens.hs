@@ -1,4 +1,6 @@
 
+-- | Definition of lenses for operating on inductive graphs
+
 module Data.IGraph.Lens
     ( ctxPrevL
     , ctxSuccL
@@ -6,20 +8,18 @@ module Data.IGraph.Lens
     , ctxLinksL
     ) where
 
-import Data.IGraph
-import Data.IntMap   (IntMap)
-import Data.Sequence (Seq)
+import           Data.IGraph
 
 -- | ctxPrevL :: Lens' (Context a b) (IntMap (Seq b))
 ctxPrevL :: Functor f
-         => (IntMap (Seq b) -> f (IntMap (Seq b)))
+         => ([(NodeId, b)] -> f [(NodeId, b)])
          -> Context a b
          -> f (Context a b)
 ctxPrevL f (Context p n s) = fmap (\p' -> Context p' n s) (f p)
 
 -- | ctxSuccL :: Lens' (Context a b) (IntMap (Seq b))
 ctxSuccL :: Functor f
-         => (IntMap (Seq b) -> f (IntMap (Seq b)))
+         => ([(NodeId, b)] -> f [(NodeId, b)])
          -> Context a b
          -> f (Context a b)
 ctxSuccL f (Context p n s) = fmap (\s' -> Context p n s') (f s)
@@ -34,7 +34,7 @@ ctxNodeL f (Context p n s) = fmap (\n' -> Context p n' s) (f n)
 -- | ctxLinksL :: Traversal (Context a b) (Context a b')
 --                          (IntMap (Seq b)) (IntMap (Seq b'))
 ctxLinksL :: Applicative f
-          => (IntMap (Seq b) -> f (IntMap (Seq b')))
+          => ([(NodeId, b)] -> f [(NodeId, b')])
           -> Context a b
           -> f (Context a b')
 ctxLinksL f (Context p n s) = Context <$> f p <*> pure n <*> f s
